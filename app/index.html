@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SafeSABR dash.js Experiment</title>
+    <style>
+        html, body { margin: 0; min-height: 100%; background: #111; color: #eee; font-family: sans-serif; }
+        main { display: grid; place-items: center; min-height: 100vh; }
+        video { width: min(96vw, 1280px); max-height: 90vh; background: #000; }
+        #status { position: fixed; left: 12px; bottom: 8px; font-size: 13px; }
+    </style>
+</head>
+<body>
+<main>
+    <video id="video" muted playsinline></video>
+</main>
+<div id="status">initializing</div>
+<script src="/vendor/dash.all.min.js"></script>
+<script src="/policy.js"></script>
+<script src="/baseline_rules.js"></script>
+<script src="/flight_rescue_rule.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

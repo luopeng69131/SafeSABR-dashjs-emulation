@@ -1,0 +1,109 @@
+name: safesabr-browser
+
+services:
+  web:
+    image: safesabr-browser-web:latest
+    build:
+      context: ./app
+    volumes:
+      - ./app:/usr/share/nginx/html:ro
+    networks:
+      - control
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  media:
+    image: safesabr-browser-media:latest
+    build:
+      context: ./shaper
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TRACE_FILE: /traces/active.trace
+      SHAPER_INTERFACE: eth0
+      BASE_RTT_MS: ${BASE_RTT_MS:-40}
+      GOODPUT_CALIBRATION_DENOMINATOR: ${GOODPUT_CALIBRATION_DENOMINATOR:-1200}
+      BURST_WINDOW_MS: ${BURST_WINDOW_MS:-10}
+      CONTROL_PORT: "8081"
+    volumes:
+      - ${MEDIA_DIR:-./media/formal}:/usr/share/nginx/html/video:ro
+      - ${TRACE_FILE:-./config/smoke.trace}:/traces/active.trace:ro
+    networks:
+      - media
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/status"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  chrome:
+    image: selenium/standalone-chromium:4.35.0
+    shm_size: 2gb
+    healthcheck:
+      test: ["CMD", "/opt/bin/check-grid.sh"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+    environment:
+      SE_NODE_SESSION_TIMEOUT: "600"
+      SE_NODE_MAX_SESSIONS: "1"
+      SE_NODE_OVERRIDE_MAX_SESSIONS: "false"
+    networks:
+      - control
+      - media
+
+  runner:
+    image: safesabr-browser-runner:latest
+    build:
+      context: ./runner
+    depends_on:
+      chrome:
+        condition: service_healthy
+      media:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      SELENIUM_URL: http://chrome:4444/wd/hub
+      PLAYER_URL: http://web/
+      MPD_URL: http://media:8080/video/stream.mpd
+      SHAPER_START_URL: http://media:8081/start
+      METHOD: ${METHOD:-dash_dynamic}
+      SESSION_ID: ${SESSION_ID:-smoke}
+      TRACE_ID: ${TRACE_ID:-smoke.trace}
+      TRACE_START_SECOND: ${TRACE_START_SECOND:-0}
+      POLICY_SEED: ${POLICY_SEED:-42}
+      POLICY_ASSET: ${POLICY_ASSET:-safesabr_seed42.json}
+      RISK_THRESHOLD: ${RISK_THRESHOLD:-}
+      PLAYBACK_TIMEOUT_S: ${PLAYBACK_TIMEOUT_S:-180}
+      STOP_AFTER_MEDIA_S: ${STOP_AFTER_MEDIA_S:-0}
+      MAX_SCREENING_REBUFFER_S: ${MAX_SCREENING_REBUFFER_S:-0}
+      PROBE_CHUNK: ${PROBE_CHUNK:--1}
+      PROBE_ACTION: ${PROBE_ACTION:--1}
+      PROBE_RESCUE_CHUNK: ${PROBE_RESCUE_CHUNK:--1}
+      PROBE_RESCUE_ACTION: ${PROBE_RESCUE_ACTION:--1}
+      PROBE_RESCUE_AFTER_MS: ${PROBE_RESCUE_AFTER_MS:-500}
+      BUFFER_TIME_DEFAULT_S: ${BUFFER_TIME_DEFAULT_S:-60}
+      BUFFER_TIME_TOP_S: ${BUFFER_TIME_TOP_S:-60}
+      BUFFER_TIME_TOP_LONG_S: ${BUFFER_TIME_TOP_LONG_S:-60}
+      BUFFER_TO_KEEP_S: ${BUFFER_TO_KEEP_S:-20}
+      BUFFER_PRUNING_INTERVAL_S: ${BUFFER_PRUNING_INTERVAL_S:-10}
+      RESULT_PATH: /results/${RESULT_FILE:-smoke.json}
+    volumes:
+      - ./results:/results
+      - ./runner/run_browser.py:/runner/run_browser.py:ro
+    networks:
+      - control
+      - media
+
+networks:
+  control:
+    internal: true
+  media:
+    internal: true

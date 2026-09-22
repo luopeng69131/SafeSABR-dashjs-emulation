@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the SafeSABR paper."
+title: "SafeSABR: Risk-Calibrated Adaptive Bitrate Streaming over Starlink Networks"
+type: software
+authors:
+  - family-names: Xie
+    given-names: Hongjun
+  - family-names: Zhu
+    given-names: Jiahang
+  - family-names: Shao
+    given-names: Zhiming
+  - family-names: Fan
+    given-names: Chao
+  - family-names: Zhang
+    given-names: Zenghui
+  - family-names: Yang
+    given-names: Genke
+  - family-names: Luo
+    given-names: Pengcheng
+repository-code: "https://github.com/luopeng69131/SafeSABR-dashjs-emulation"
+url: "https://arxiv.org/abs/2605.23560"
+license: Apache-2.0
+version: 1.0.0
+date-released: 2026-09-11
+identifiers:
+  - type: url
+    value: "https://arxiv.org/abs/2605.23560"
+    description: "SafeSABR paper on arXiv"

@@ -1,0 +1,9 @@
+/media/*
+!/media/.gitkeep
+/results/*
+!/results/.gitkeep
+app/assets/chunk_sizes.json
+config/active_trace.trace
+__pycache__/
+*.py[cod]
+.DS_Store

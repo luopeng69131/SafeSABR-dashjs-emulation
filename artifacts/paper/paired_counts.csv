@@ -1,0 +1,8 @@
+target,baseline,paired_sessions,qoe_wins,qoe_ties,qoe_losses,rebuffer_wins,rebuffer_ties,rebuffer_losses,severe_improvements,severe_regressions,severe_ties,exact_mcnemar_p
+safesabr_selective_rescue,cmab,30,2,0,28,23,3,4,8,0,22,0.0078125
+safesabr_selective_rescue,dash_dynamic,30,29,0,1,2,4,24,0,5,25,0.0625
+safesabr_selective_rescue,lumos_mpc,30,24,0,6,30,0,0,23,0,7,2.384185791015625e-07
+safesabr_selective_rescue,robust_mpc,30,21,0,9,20,3,7,5,1,24,0.21875
+safesabr_selective_rescue,sara,30,19,0,11,22,2,6,4,0,26,0.125
+safesabr_selective_rescue,starnet_mpc,30,21,0,9,30,0,0,22,0,8,4.76837158203125e-07
+safesabr_selective_rescue,wabb,30,28,0,2,24,0,6,17,0,13,1.52587890625e-05
