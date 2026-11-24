@@ -5,13 +5,9 @@
 
 [English](README.md)
 
-本仓库提供 **SafeSABR** 的浏览器端实验复现环境。SafeSABR 是一个面向高波动
-Starlink 链路的风险校准自适应码率（ABR）框架。实验使用完整的 HTTP/TCP 播放链路，
-包括 Chrome、dash.js、Media Source Extensions，以及运行在独立网络命名空间中的
-Linux 流量整形器。
-
-仓库提供训练完成的 SafeSABR 策略、运行时风险模型、ABR 对比方法及播放和分析脚本。
-Starlink 测量数据请从 [StarNet 官方项目](https://github.com/ConnectedSystemsLab/StarNet#starnet-measurement-dataset)获取，并在本地准备评估输入。
+本项目在浏览器中评估 **SafeSABR**，一种面向高波动 Starlink 链路的风险校准自适应码率
+（ABR）框架。实验回放实测链路条件，在 Chrome 中通过 dash.js 进行 HTTP/TCP 视频播放，
+测量播放质量和会话级卡顿。
 
 ## Emulation 概览
 
@@ -30,8 +26,6 @@ Starlink 测量数据请从 [StarNet 官方项目](https://github.com/ConnectedS
 - 至少 8 GB 可用磁盘空间，用于生成 DASH 视频和构建容器
 - 默认串行执行建议至少 8 GB 内存
 
-流量整形仅在独立 Docker 容器中进行，不会在宿主机网络接口上执行流量控制命令。
-
 ### 1. 准备环境
 
 ```bash
@@ -47,7 +41,7 @@ bash scripts/prepare_runtime.sh
 bash scripts/run_smoke.sh
 ```
 
-Smoke test 使用运行时生成的合成网络条件，分别运行 dash.js Dynamic 和 SafeSABR，无需 StarNet 数据。
+Smoke test 在合成网络条件下分别运行 dash.js Dynamic 和 SafeSABR。
 
 ### 3. 运行评估
 
@@ -94,17 +88,16 @@ bash scripts/analyze_results.sh
 python3 scripts/verify_artifact.py
 ```
 
-所有方法共享相同的浏览器、视频、trace、网络整形器、码率阶梯和缓存配置。对于原始
-系统采用不同播放模式或包含额外控制变量的 LEO 方法，本仓库将其码率选择部分适配到
-统一的固定时长 VOD 环境。具体实现边界和参考来源见
-[docs/BASELINES.md](docs/BASELINES.md)。
+所有方法共用相同的浏览器、视频、网络 trace、码率阶梯和缓冲设置。实验将面向低轨卫星
+的基线方法的码率选择逻辑适配到统一的固定时长视频点播环境。实现与来源见
+[对比方法说明](docs/BASELINES.md)。
 
 ## Emulation 细节
 
 ![SafeSABR dash.js emulation 详细技术架构](docs/images/emulation_architecture.png)
 
-每个 session 在统一的 dash.js 播放器中选择一种可插拔 ABR controller。所有方法
-共享相同的 runner、浏览器、播放器服务、视频源、trace 回放和结果分析路径。
+实验执行器启动视频播放与 trace 回放，为每个会话启用一种 ABR 控制器，并收集播放和
+网络日志，用于分析 QoE 和卡顿。
 
 ## 致谢
 

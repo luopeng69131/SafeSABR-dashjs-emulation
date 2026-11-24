@@ -5,16 +5,10 @@
 
 [中文说明](README_zh.md)
 
-This repository provides the browser-based evaluation artifact for
-**SafeSABR**, a risk-calibrated adaptive bitrate (ABR) framework for video
-streaming over volatile Starlink links. It reproduces the paper's dash.js
-experiment through a complete HTTP/TCP playback path comprising Chrome,
-dash.js, Media Source Extensions, and an isolated Linux traffic shaper.
-
-The repository provides the trained SafeSABR policy, its runtime risk model,
-the evaluated ABR implementations, and the scripts for playback and analysis.
-Obtain the Starlink measurements from [StarNet](https://github.com/ConnectedSystemsLab/StarNet#starnet-measurement-dataset)
-and prepare the evaluation inputs locally.
+This testbed evaluates **SafeSABR**, a risk-calibrated adaptive bitrate (ABR)
+framework for video streaming over volatile Starlink links. It replays
+measured link conditions while Chrome and dash.js stream video over HTTP/TCP,
+and measures playback quality and session-level rebuffering.
 
 ## Emulation at a Glance
 
@@ -35,9 +29,6 @@ analysis.
 - At least 8 GB of free disk space for generated DASH media and containers
 - At least 8 GB of memory for the default serial execution
 
-No host-level traffic-control command is used. Network shaping runs inside an
-isolated Docker container with a dedicated network namespace.
-
 ### 1. Prepare the Environment
 
 ```bash
@@ -53,8 +44,7 @@ This command verifies the included artifacts, generates the six-representation
 bash scripts/run_smoke.sh
 ```
 
-The smoke test runs dash.js Dynamic and SafeSABR on a generated synthetic
-network profile. It needs no StarNet data.
+The smoke test runs dash.js Dynamic and SafeSABR on a synthetic network profile.
 
 ### 3. Run the Evaluation
 
@@ -107,20 +97,18 @@ The exported SafeSABR policy and runtime risk model are included in
 python3 scripts/verify_artifact.py
 ```
 
-All methods share the same browser, media, trace, network shaper, bitrate
-ladder, and buffer configuration. The LEO-aware methods are adapted to the
-common fixed-duration VOD action space where their original systems use a
-different playback mode or additional controls. See
-[docs/BASELINES.md](docs/BASELINES.md) for exact implementation boundaries and
-source references.
+All methods share the same browser, media, network trace, bitrate ladder, and
+buffer settings. The testbed adapts the bitrate selection of LEO-aware
+baselines to a common fixed-duration video-on-demand setting. See
+[Baseline Methods](docs/BASELINES.md) for the implementations and their sources.
 
 ## Emulation Details
 
 ![Detailed SafeSABR dash.js emulation architecture](docs/images/emulation_architecture.png)
 
-Each session selects one pluggable ABR controller inside the shared dash.js
-player. The runner, browser, player service, media origin, trace replay, and
-evaluation path remain common across all methods.
+The runner starts playback and trace replay, activates one ABR controller
+per session, and collects playback and network logs for QoE and rebuffering
+analysis.
 
 ## Acknowledgments
 
