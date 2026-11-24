@@ -1,0 +1,14 @@
+/media/*
+!/media/.gitkeep
+/results/*
+!/results/.gitkeep
+/artifacts/paper/
+app/assets/chunk_sizes.json
+app/assets/external_baselines.json
+/data/local/
+/data/starlink_holdout30/
+/data/manifests/
+*.trace
+__pycache__/
+*.py[cod]
+.DS_Store
